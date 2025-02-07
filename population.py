@@ -9,7 +9,6 @@ class Population:
         self.output_size = output_size
 
         self.individus = [ self.ia_constructor(input_size,output_size) for _ in range(individus_count)]
-        self.scores = [ ]
 
         self.individus_actual = 0
         self.generations_actual = 0
@@ -38,17 +37,14 @@ class Population:
         return child1, child2
 
     def get_bests(self,n):
-        return [ self.individus[x[1]] for x in self.scores[0:n] ]
+        return self.individus[0:n]
 
     def get_randoms(self,n):
-        score_v = np.array([x[0] for x in self.scores])
+        score_v = np.array([x.total_reward for x in self.individus])
         score_v -= score_v[-1]
         score_v = score_v / np.sum(score_v)
-        score_i = [x[1] for x in self.scores]
 
-        random_i = np.random.choice(score_i, n, p=score_v)
-
-        return [ self.individus[i] for i in random_i ]
+        return np.random.choice(self.individus, n, p=score_v)
 
     def next_generation(self):
         bests_count = (self.individus_count >> 3)  # 12.5%
@@ -68,18 +64,20 @@ class Population:
 
         assert len(next_individus) == self.individus_count
 
+        for x in next_individus:
+            x.reset()
+
         self.individus = next_individus
 
     def get_actual(self):
         return self.individus[self.individus_actual]
 
-    def step(self, score):
-        self.scores.append((score,self.individus_actual))
+    def step(self):
         if self.individus_actual == self.individus_count - 1:
             self.individus_actual = 0
             self.generations_actual += 1
-            self.scores.sort(reverse=True)
-            print(self.scores)
+            self.individus.sort(reverse=True,key=lambda ia:ia.total_reward)
+            print([x.total_reward for x in self.individus])
             self.next_generation()
         else:
             self.individus_actual += 1

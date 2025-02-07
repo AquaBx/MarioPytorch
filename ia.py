@@ -5,6 +5,8 @@ from neural import Neural
 class IA:
     def __init__(self, input_dim : int, output_dim : int):
 
+        self.total_reward = 0
+
         self.mutation_rate = 0.1
 
         self.current_step = 0
@@ -39,3 +41,9 @@ class IA:
             mutation_noise = torch.randn_like(param) * 0.5
             mask = torch.rand_like(param) < self.mutation_rate
             param.data += mask * mutation_noise
+
+    def reward(self, score):
+        self.total_reward += score
+
+    def reset(self):
+        self.total_reward = 0

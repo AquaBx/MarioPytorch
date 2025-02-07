@@ -13,14 +13,13 @@ env = JoypadSpace(env, RIGHT_ONLY)
 
 viewer = Viewer("Window",Vector(352,240))
 ramreader = ramReader(env)
-population = Population(IA,50,10, viewer.sensorsN , env.action_space.n)
+population = Population(IA,16,10, viewer.sensorsN , env.action_space.n)
 
 while not( population.finished() ):
     env.reset()
     ramreader.reset()
     life = 0
     distance = 0
-    score = 0
 
     actual = population.get_actual()
     cooldown = 0
@@ -37,7 +36,7 @@ while not( population.finished() ):
 
         next_state, reward, done, info = env.step(action)
 
-        score += reward
+        actual.reward(reward)
 
         life = max( info['life'], life )
 
@@ -51,7 +50,7 @@ while not( population.finished() ):
         if done or info['flag_get'] or life > info['life'] or cooldown > 300:
             break
 
-    population.step(score)
+    population.step()
 
 viewer.destroy()
 env.close()
