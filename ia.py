@@ -17,7 +17,7 @@ class IA:
 
         self.use_cuda = torch.cuda.is_available()
 
-        self.net = Neural(input_dim,output_dim).float()
+        self.net = Neural(input_dim,output_dim).half()
         if self.use_cuda:
             self.net = self.net.to(device='cuda')
 
@@ -47,3 +47,26 @@ class IA:
 
     def reset(self):
         self.total_reward = 0
+
+    def save(self,save_dir):
+        save_path = save_dir / f"mario_net_best.pt"
+        torch.save(
+            dict(
+                model=self.net.state_dict(),
+                exploration_rate=self.exploration_rate
+            ),
+            save_path
+        )
+        print(f"MarioNet saved to {save_path}")
+
+    def load(self, load_path):
+        if not load_path.exists():
+            raise ValueError(f"{load_path} does not exist")
+
+        ckp = torch.load(load_path, map_location=('cuda' if self.use_cuda else 'cpu'))
+        exploration_rate = ckp.get('exploration_rate')
+        state_dict = ckp.get('model')
+
+        print(f"Loading model at {load_path} with exploration rate {exploration_rate}")
+        self.net.load_state_dict(state_dict)
+        self.exploration_rate = exploration_rate

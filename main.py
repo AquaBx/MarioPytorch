@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import COMPLEX_MOVEMENT,SIMPLE_MOVEMENT,RIGHT_ONLY
@@ -13,7 +15,9 @@ env = JoypadSpace(env, RIGHT_ONLY)
 
 viewer = Viewer("Window",Vector(352,240))
 ramreader = ramReader(env)
-population = Population(IA,16,10, viewer.sensorsN , env.action_space.n)
+population = Population(IA,16,1, viewer.sensorsN , env.action_space.n)
+
+population.individus[0].load(Path("checkpoints/mario_net_best.pt"))
 
 while not( population.finished() ):
     env.reset()
@@ -54,3 +58,9 @@ while not( population.finished() ):
 
 viewer.destroy()
 env.close()
+
+save_dir = Path('checkpoints')
+if not( save_dir.exists() ):
+    save_dir.mkdir(parents=True)
+
+population.individus[0].save(save_dir)

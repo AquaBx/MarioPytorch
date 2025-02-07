@@ -91,7 +91,7 @@ class Viewer:
 
     def getTorchSensors(self):
         a = [x.distance() for x in self.sensors]
-        b = torch.FloatTensor(a)
+        b = torch.HalfTensor(a)
         return b
 
     def _updateFrame(self,img):
