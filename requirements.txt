@@ -1,5 +1,5 @@
 numpy==1.26.4
-torch==2.6.0
+torch==2.7.1
 nes_py==8.2.1
 opencv-python==4.11.0.86
 gym==0.22.0
